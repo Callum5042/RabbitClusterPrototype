@@ -22,7 +22,7 @@ public class AutoPublisherService : BackgroundService
         {
             _logger.LogInformation("Message published {BackgroundService}", nameof(AutoPublisherService));
 
-            var endpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:submit-order"));
+            var endpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:submit-order-v2"));
             await endpoint.Send(new SubmitOrder
             {
                 Id = Guid.NewGuid(),
