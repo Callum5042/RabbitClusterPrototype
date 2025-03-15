@@ -5,29 +5,45 @@ services:
       context: .
       dockerfile: MassTransit.Consumer/Dockerfile
     environment:
-      - MassTransitSettings__Host=rabbitmq
+      - MassTransitSettings__Host=haproxy
       - MassTransitSettings__Port=5672
       - MassTransitSettings__VHost=/
       - MassTransitSettings__Username=guest
       - MassTransitSettings__Password=guest
+    depends_on:
+      - haproxy
+
   masstransit.publisher:
     build:
       context: .
       dockerfile: MassTransit.Publisher/Dockerfile
     environment:
-      - MassTransitSettings__Host=rabbitmq
+      - MassTransitSettings__Host=haproxy
       - MassTransitSettings__Port=5672
       - MassTransitSettings__VHost=/
       - MassTransitSettings__Username=guest
       - MassTransitSettings__Password=guest
+    depends_on:
+      - haproxy
+ 
+  haproxy:
+    image: haproxy:3.1.5
+    container_name: haproxy
+    hostname: haproxy
+    ports:
+      - "56721:5672"
+      - "20001:15672"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - rabbitmq
+
   rabbitmq:
     image: rabbitmq:4.0.7-management
     container_name: rabbitmq1
     hostname: 'rabbitmq-m1'
-    ports:
-      - "56721:5672"
-      - "20001:15672"
-    restart: always
+    volumes:
+      - "./data:/var/lib/rabbitmq/mnesia/"
 
 networks:
   default:
