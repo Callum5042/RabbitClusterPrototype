@@ -10,6 +10,7 @@ services:
       - MassTransitSettings__VHost=/
       - MassTransitSettings__Username=guest
       - MassTransitSettings__Password=guest
+      - MassTransitSettings__ClusterSize=3
     depends_on:
       - haproxy
 
@@ -36,14 +37,39 @@ services:
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     depends_on:
-      - rabbitmq
+      - rabbitmq1
+      - rabbitmq2
+      - rabbitmq3
 
-  rabbitmq:
+  rabbitmq1:
     image: rabbitmq:4.0.7-management
     container_name: rabbitmq1
-    hostname: 'rabbitmq-m1'
+    hostname: 'rabbitmq1'
     volumes:
       - "./data:/var/lib/rabbitmq/mnesia/"
+      - "./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf"
+      - "./erlang.cookie:/var/lib/rabbitmq/.erlang.cookie"
+    command: /bin/sh -c "chmod 400 /var/lib/rabbitmq/.erlang.cookie && /usr/local/bin/docker-entrypoint.sh rabbitmq-server"
+
+  rabbitmq2:
+    image: rabbitmq:4.0.7-management
+    container_name: rabbitmq2
+    hostname: 'rabbitmq2'
+    volumes:
+      - "./data:/var/lib/rabbitmq/mnesia/"
+      - "./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf"
+      - "./erlang.cookie:/var/lib/rabbitmq/.erlang.cookie"
+    command: /bin/sh -c "chmod 400 /var/lib/rabbitmq/.erlang.cookie && /usr/local/bin/docker-entrypoint.sh rabbitmq-server"
+
+  rabbitmq3:
+    image: rabbitmq:4.0.7-management
+    container_name: rabbitmq3
+    hostname: 'rabbitmq3'
+    volumes:
+      - "./data:/var/lib/rabbitmq/mnesia/"
+      - "./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf"
+      - "./erlang.cookie:/var/lib/rabbitmq/.erlang.cookie"
+    command: /bin/sh -c "chmod 400 /var/lib/rabbitmq/.erlang.cookie && /usr/local/bin/docker-entrypoint.sh rabbitmq-server"
 
 networks:
   default:

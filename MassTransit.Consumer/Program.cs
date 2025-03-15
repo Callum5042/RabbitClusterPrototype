@@ -28,8 +28,9 @@ internal class Program
                             h.Password(settings.Password);
                         });
 
-                        cfg.ReceiveEndpoint("submit-order", e =>
+                        cfg.ReceiveEndpoint("submit-order-v2", e =>
                         {
+                            e.SetQuorumQueue(settings.ClusterSize);
                             e.ConfigureConsumer<SubmitOrderConsumer>(context);
                         });
                     });
