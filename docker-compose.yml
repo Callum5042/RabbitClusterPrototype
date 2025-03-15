@@ -1,0 +1,34 @@
+services:
+  masstransit.consumer:
+    image: ${DOCKER_REGISTRY-}masstransitconsumer
+    build:
+      context: .
+      dockerfile: MassTransit.Consumer/Dockerfile
+    environment:
+      - MassTransitSettings__Host=rabbitmq
+      - MassTransitSettings__Port=5672
+      - MassTransitSettings__VHost=/
+      - MassTransitSettings__Username=guest
+      - MassTransitSettings__Password=guest
+  masstransit.publisher:
+    build:
+      context: .
+      dockerfile: MassTransit.Publisher/Dockerfile
+    environment:
+      - MassTransitSettings__Host=rabbitmq
+      - MassTransitSettings__Port=5672
+      - MassTransitSettings__VHost=/
+      - MassTransitSettings__Username=guest
+      - MassTransitSettings__Password=guest
+  rabbitmq:
+    image: rabbitmq:4.0.7-management
+    container_name: rabbitmq1
+    hostname: 'rabbitmq-m1'
+    ports:
+      - "56721:5672"
+      - "20001:15672"
+    restart: always
+
+networks:
+  default:
+    driver: bridge
